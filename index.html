@@ -2,12 +2,12 @@
 <html lang="es">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=430, initial-scale=1, user-scalable=no" />
-  <title>Calculadora Visual 430×932</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Calculadora Visual</title>
 
   <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@2/css/pico.min.css">
   <link rel="stylesheet" href="assets/app.css">
-  
+
   <script defer src="assets/app.js"></script>
   <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
   
@@ -15,13 +15,7 @@
 <body>
   <!-- Componente raíz -->
   <div class="canvas" x-data="calcUI()">
-    <!-- Barra de estado -->
-    <div class="status">
-      <div class="pill">09:41</div>
-      <div class="pill">🔋100%</div>
-    </div>
-
-    <!-- Pantalla: siempre muestra la fórmula -->
+    <!-- Pantalla -->
     <section class="screen">
       <div class="label">Fórmula</div>
       <div class="formula" x-text="formulaStr()"></div>
@@ -32,29 +26,19 @@
       <template x-for="k in teclas" :key="k.id">
         <button class="btn" :aria-label="k.label" @click="handleKey(k)" x-text="k.label"></button>
       </template>
-
       <button class="btn btn--accent btn--wide" @click="mostrar()">Mostrar</button>
     </section>
 
-    <div class="footer">UI fija 430×932 · Alpine.js modular · CLP formatter</div>
+    <div class="footer">Alpine.js modular · Formato CLP · Responsive móvil</div>
 
-    <!-- Modal de ingreso de valor -->
+    <!-- Modal de ingreso -->
     <div class="modal-backdrop" x-show="modal.open" x-transition.opacity>
       <div class="modal" x-transition.scale>
         <h3 x-text="modal.title"></h3>
-
         <label class="modal-label">Valor:</label>
-        <input class="modal-input"
-               type="text"
-               placeholder="Ingrese valor"
-               x-model="modal.raw"
-               @input="onModalInput()"
-               @keydown.enter.prevent="saveModal()" />
-
-        <p class="preview">
-          <strong>Vista previa: </strong><span x-text="modal.preview"></span>
-        </p>
-
+        <input class="modal-input" type="text" placeholder="Ingrese valor"
+               x-model="modal.raw" @input="onModalInput()" @keydown.enter.prevent="saveModal()" />
+        <p class="preview"><strong>Vista previa: </strong><span x-text="modal.preview"></span></p>
         <div class="modal-actions">
           <button class="btn" @click="closeModal()">Cancelar</button>
           <button class="btn btn--accent" @click="saveModal()">Guardar</button>
@@ -62,39 +46,20 @@
       </div>
     </div>
 
-    <!-- Modal de RESUMEN (se abre con Mostrar) -->
+    <!-- Modal de resumen -->
     <div class="modal-backdrop" x-show="summary.open" x-transition.opacity>
       <div class="modal modal-lg" x-transition.scale>
         <h3>Resumen</h3>
         <table class="resumen">
           <tbody>
-            <tr>
-              <th>Deuda Total</th>
-              <td x-text="values.dt != null ? formatCLP(values.dt) : '—'"></td>
-            </tr>
-            <tr>
-              <th>Pie</th>
-              <td x-text="values.pie != null ? formatCLP(values.pie) : '—'"></td>
-            </tr>
-            <tr>
-              <th>Desc. Proporcionado</th>
-              <td x-text="values.desc != null ? formatCLP(values.desc) : '—'"></td>
-            </tr>
-            <tr>
-              <th>% Desc. Proporcionado</th>
-              <td x-text="percentDescStr()"></td>
-            </tr>
-            <tr>
-              <th>Cuotas</th>
-              <td x-text="values.cuotas != null ? formatEntero(values.cuotas) : '—'"></td>
-            </tr>
-            <tr class="total">
-              <th>Total</th>
-              <td x-text="totalStr()"></td>
-            </tr>
+            <tr><th>Deuda Total</th>          <td x-text="values.dt != null ? formatCLP(values.dt) : '—'"></td></tr>
+            <tr><th>Pie</th>                  <td x-text="values.pie != null ? formatCLP(values.pie) : '—'"></td></tr>
+            <tr><th>Desc. Proporcionado</th>  <td x-text="values.desc != null ? formatCLP(values.desc) : '—'"></td></tr>
+            <tr><th>% Desc. Proporcionado</th><td x-text="percentDescStr()"></td></tr>
+            <tr><th>Cuotas</th>               <td x-text="values.cuotas != null ? formatEntero(values.cuotas) : '—'"></td></tr>
+            <tr class="total"><th>Total</th>  <td x-text="totalStr()"></td></tr>
           </tbody>
         </table>
-
         <div class="modal-actions">
           <button class="btn btn--accent" @click="summary.open=false">Cerrar</button>
         </div>
