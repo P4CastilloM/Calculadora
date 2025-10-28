@@ -1,133 +1,185 @@
+/* ====== Base: sin scroll, responsive, safe areas ====== */
 :root{
-  --bg: #0b0b0f;
+  /* Dark (default) */
+  --bg: #0c0c12;
+  --panel: linear-gradient(180deg, #0f1016 0%, #0b0c12 100%);
   --muted: #8b8b95;
-  --btn-txt: #f5f5f7;
+  --text: #ffffff;
+  --screen-bg: linear-gradient(180deg, #141622 0%, #111420 100%);
+  --btn-bg: #1e1f2a;
+  --btn-text: #f5f5f7;
+  --accent-top: #ffb43b;
+  --accent-bot: #ff9f0a;
+
   --round: 18px;
+  --shadow-outer: 0 18px 80px rgba(0,0,0,.55);
+  --shadow-btn: 0 8px 18px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.04);
+  --border-soft: #2b2d3c;
+}
+
+/* Light mode overrides */
+@media (prefers-color-scheme: light){
+  :root{
+    --bg: #f5f7fb;
+    --panel: #ffffff;
+    --muted: #4b5563;
+    --text: #111827;
+    --screen-bg: #ffffff;
+    --btn-bg: #eef2f7;
+    --btn-text: #111827;
+    --shadow-outer: 0 8px 24px rgba(0,0,0,.08);
+    --shadow-btn: 0 6px 12px rgba(0,0,0,.08);
+    --border-soft: #e5e7eb;
+  }
 }
 
 html, body{
   height: 100%;
   margin: 0;
-  background: #0c0c12;
-  color: white;
+  color: var(--text);
+  background: var(--bg);
   font-family: ui-sans-serif, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+  /* ❌ bloquear scroll de página */
+  overflow: hidden;
 }
 
-/* Contenedor responsive:
-   - Ocupa todo el alto con 100dvh (evita salto de barras en móvil)
-   - ancho fluido con límites: 360–480px (S22 Ultra ~412, iPhone Pro Max ~430)
-   - respeta safe areas en iOS (viewport-fit=cover + env()) */
+/* Lienzo responsive que SIEMPRE llena el alto visible y no scrollea */
 .canvas{
   width: min(100vw, 480px);
-  min-width: 360px;
-  height: 100dvh;
+  min-width: 320px;               /* teléfonos angostos */
+  height: 100svh;                  /* alto visible (sin barra de navegador) */
+  min-height: 100dvh;              /* fallback */
   margin-inline: auto;
   padding: calc(12px + env(safe-area-inset-top, 0px)) 12px calc(12px + env(safe-area-inset-bottom, 0px));
   border-radius: 24px;
-  background: linear-gradient(180deg, #0f1016 0%, #0b0c12 100%);
-  box-shadow: 0 18px 80px rgba(0,0,0,.55);
+  background: var(--panel);
+  box-shadow: var(--shadow-outer);
   display: flex;
   flex-direction: column;
   gap: 12px;
+  /* importante: que nada interno cree scroll del contenedor */
+  overflow: hidden;
 }
 
-/* Pantalla (más pequeña, fija en alto con clamp) */
+/* ====== Pantalla (más compacta) ====== */
 .screen{
   flex: 0 0 auto;
-  height: clamp(120px, 18vh, 170px);
+  height: clamp(104px, 16vh, 160px);
   padding: 10px 12px;
   border-radius: var(--round);
-  background: linear-gradient(180deg, #141622 0%, #111420 100%);
+  background: var(--screen-bg);
   display: flex;
   flex-direction: column;
   gap: 6px;
+  overflow: hidden;
 }
 .label{ color: var(--muted); font-size: 12px; }
 .formula{
-  font-size: clamp(14px, 3.8vw, 18px);
+  font-size: clamp(14px, 3.6vw, 18px);
   line-height: 1.25;
   font-weight: 700;
-  color: #f2f2f5;
+  color: var(--text);
   word-break: break-word;
   min-height: 36px;
 }
 
-/* Teclado */
+/* ====== Teclado (se adapta, sin overflow) ====== */
 .keys{
   flex: 1 1 auto;
   display: grid;
   gap: 12px;
   align-content: start;
-  /* 2 columnas por defecto (teléfonos angostos) */
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, 1fr);  /* por defecto 2 columnas */
+  overflow: hidden;                       /* no scroll */
 }
-/* Desde ~400px (S22 Ultra e iPhone grandes): 3 columnas */
+/* 3 columnas en teléfonos anchos (iPhone Pro Max, S22 Ultra, etc.) */
 @media (min-width: 400px){
   .keys{ grid-template-columns: repeat(3, 1fr); }
 }
 
 .btn{
-  height: clamp(68px, 9vh, 84px);
+  height: clamp(64px, 9vh, 84px);
   border-radius: 16px;
   border: none;
-  background: #1e1f2a;
-  color: var(--btn-txt);
+  background: var(--btn-bg);
+  color: var(--btn-text);
   font-size: clamp(16px, 2.6vw, 18px);
   font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 8px 18px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.04);
+  box-shadow: var(--shadow-btn);
   cursor: pointer;
   transition: transform .06s ease;
+  /* si el grid quedara justo, evita que el texto desborde */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .btn:active{ transform: scale(.98); }
 
 .btn--accent{
-  background: linear-gradient(180deg, #ffb43b 0%, #ff9f0a 100%);
+  background: linear-gradient(180deg, var(--accent-top) 0%, var(--accent-bot) 100%);
   color: #1b1205;
   font-weight: 800;
 }
 .btn--wide{
   grid-column: 1 / -1;
-  height: clamp(72px, 10vh, 90px);
+  height: clamp(70px, 10vh, 90px);
   font-size: clamp(18px, 3vw, 20px);
 }
 
-/* Footer discreto */
+/* ====== Footer ====== */
 .footer{
   text-align: center;
   color: var(--muted);
   font-size: 11px;
+  flex: 0 0 auto;
 }
 
-/* Modales y tabla (igual, con máximo relativo al ancho del teléfono) */
+/* ====== Modales ====== */
 .modal-backdrop{
   position: fixed; inset: 0;
   background: rgba(0,0,0,.55);
   display: grid; place-items: center;
   padding: 16px;
+  /* permite que el modal scrollee si es necesario,
+     pero la página principal sigue fija */
+  overflow: auto;
 }
 .modal{
   width: 100%;
-  max-width: min(420px, 92vw);
+  max-width: min(460px, 94vw);
   background: #161824;
   color: #f4f5f9;
   border-radius: 16px;
   box-shadow: 0 20px 60px rgba(0,0,0,.6);
   padding: 16px;
 }
-.modal-lg{ max-width: min(460px, 94vw); }
+.modal-lg{ max-width: min(520px, 96vw); }
 .modal h3{ margin: 0 0 10px; font-size: 18px; }
 .modal-label{ font-size: 12px; color: #c9cad3; }
 .modal-input{
   width: 100%; margin-top: 6px; margin-bottom: 8px;
-  height: 44px; border-radius: 10px; border: 1px solid #2b2d3c;
+  height: 44px; border-radius: 10px; border: 1px solid var(--border-soft);
   background: #1b1e2b; color: #fff; padding: 0 12px; font-size: 16px;
 }
 .preview{ margin: 6px 0 12px; font-size: 14px; color: #d9dae3; }
 .modal-actions{ display: flex; gap: 10px; justify-content: flex-end; }
 
+/* Light mode para modal */
+@media (prefers-color-scheme: light){
+  .modal{ background: #ffffff; color:#111827; }
+  .modal h3{ color:#111827; }
+  .modal-label{ color:#374151; }
+  .modal-input{
+    background: #ffffff; color:#111827; border:1px solid #d1d5db;
+  }
+  .preview{ color:#4b5563; }
+  .modal-backdrop{ background: rgba(0,0,0,.35); }
+}
+
+/* ====== Tabla Resumen (colores claro/oscuro correctos) ====== */
 table.resumen{
   width: 100%;
   border-collapse: collapse;
@@ -137,59 +189,21 @@ table.resumen{
 }
 table.resumen th, table.resumen td{
   padding: 10px 12px;
-  border-bottom: 1px solid #2b2d3c;
+  border-bottom: 1px solid var(--border-soft);
   font-size: 14px;
 }
 table.resumen th{ text-align: left; color: #cfd1da; font-weight: 600; }
 table.resumen td{ text-align: right; color: #ffffff; font-weight: 700; }
 table.resumen tr.total th, table.resumen tr.total td{
-  background: #232636;
-  font-size: 15px;
+  background: #232636; font-size: 15px;
 }
-
-
-/* === Fix contraste en modo CLARO para el modal de Resumen y su tabla === */
-@media (prefers-color-scheme: light) {
-  /* Modal */
-  .modal,
-  .modal-lg {
-    background: #ffffff;           /* fondo claro */
-    color: #111827;                /* texto principal */
-  }
-  .modal h3 { color: #111827; }
-  .modal-label { color: #374151; }
-  .preview { color: #4b5563; }
-
-  .modal-input {
-    background: #ffffff;
-    color: #111827;
-    border: 1px solid #d1d5db;     /* gris claro */
-  }
-
-  /* Tabla resumen */
-  table.resumen {
-    background: #ffffff;
-  }
-  table.resumen th,
-  table.resumen td {
-    border-bottom: 1px solid #e5e7eb;   /* separadores visibles en claro */
-  }
-  table.resumen th {
-    color: #374151;                 /* encabezado */
-    font-weight: 600;
-  }
-  table.resumen td {
-    color: #111827;                 /* valores */
-    font-weight: 700;
-  }
-  table.resumen tr.total th,
-  table.resumen tr.total td {
-    background: #f3f4f6;           /* resalta fila Total */
-    color: #111827;
-  }
-
-  /* Fondo del backdrop un poco más suave en claro */
-  .modal-backdrop {
-    background: rgba(0,0,0,.35);
+/* Light mode de la tabla */
+@media (prefers-color-scheme: light){
+  table.resumen{ background: #ffffff; }
+  table.resumen th, table.resumen td{ border-bottom: 1px solid #e5e7eb; }
+  table.resumen th{ color:#374151; }
+  table.resumen td{ color:#111827; }
+  table.resumen tr.total th, table.resumen tr.total td{
+    background:#f3f4f6; color:#111827;
   }
 }
